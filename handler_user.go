@@ -66,6 +66,23 @@ func handlerLogin(s *state, cmd command) error {
 	return nil
 }
 
+func GetUsers(s *state, cmd command) error {
+    
+  users, err := s.db.GetUsers(context.Background())
+  if err != nil {
+      return fmt.Errorf("couldn't get current users %w",err)
+    }
+  for i := 0; i < len(users); i++ {
+
+    if users[i].Name == s.cfg.CurrentUserName {
+        fmt.Printf("%s (current)\n",users[i].Name)
+    } else {
+    fmt.Println(users[i].Name)
+    }
+  }
+
+  return nil
+}
 func printUser(user database.User) {
 	fmt.Printf(" * ID:      %v\n", user.ID)
 	fmt.Printf(" * Name:    %v\n", user.Name)
