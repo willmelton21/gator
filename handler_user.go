@@ -4,10 +4,67 @@ import (
 	"context"
 	"fmt"
 	"time"
-
 	"github.com/willmelton21/gator/internal/database"
 	"github.com/google/uuid"
+  rss "github.com/willmelton21/gator/utils"
 )
+
+func AddFeed(s *state, cmd command) error {
+  user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+  if err != nil {
+    return err
+  }
+	if len(cmd.Args) != 2 {
+		return fmt.Errorf("usage: %v <name>", cmd.Name)
+	}
+
+	name := cmd.Args[0]
+  url := cmd.Args[1]
+
+	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+    UserID:    user.ID,
+    Name:      name,
+    Url:       url,
+	})
+	if err != nil {
+		return fmt.Errorf("couldn't create feed: %w", err)
+	}
+
+  fmt.Println("Feed created successfully:")
+	printFeed(feed)
+	fmt.Println()
+	fmt.Println("=====================================")
+
+	return nil
+}
+
+func printFeed(feed database.Feed) {
+	fmt.Printf("* ID:            %s\n", feed.ID)
+	fmt.Printf("* Created:       %v\n", feed.CreatedAt)
+	fmt.Printf("* Updated:       %v\n", feed.UpdatedAt)
+	fmt.Printf("* Name:          %s\n", feed.Name)
+	fmt.Printf("* URL:           %s\n", feed.Url)
+	fmt.Printf("* UserID:        %s\n", feed.UserID)
+
+}
+
+func RunAggregator(s *state, cmd command) error {
+
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+    
+    // Call fetchFeed with the context
+    feed, err := rss.FetchFeed(ctx, "https://www.wagslane.dev/index.xml")
+    if err != nil {
+        return fmt.Errorf("Couldn't fetch feed properly %w",err)
+  }
+    fmt.Printf("%+v\n", feed)
+    return nil
+}
+
 
 func handlerDelete(s *state, cmd command) error {
 
