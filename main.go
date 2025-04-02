@@ -42,6 +42,7 @@ func main() {
   cmds.register("users",GetUsers)
   cmds.register("agg", RunAggregator)
   cmds.register("addfeed",AddFeed)
+  cmds.register("feeds",PrintFeeds)
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: cli <command> [args...]")
 		return
