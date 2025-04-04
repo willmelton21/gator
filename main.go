@@ -36,6 +36,8 @@ func main() {
 	cmds := commands{
 		registeredCommands: make(map[string]func(*state, command) error),
 	}
+  cmds.register("follow",handlerFollow)
+  cmds.register("following",HandlerFollowing)
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
   cmds.register("reset",handlerDelete)
