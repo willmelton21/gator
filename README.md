@@ -64,5 +64,3 @@ Some commands, such as `browse`, `follow`, `addfeed`, etc., require you to be lo
 - Config file is automatically read from your home directory when running any command.
 - You can change the current user with the `login` command, which updates your `.gatorconfig.json`.
 ```
-
-Let me know if you'd like to add badges (e.g. Go Report Card, License, Build), contribution instructions, or an example usage section.
