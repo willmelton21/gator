@@ -36,6 +36,7 @@ func main() {
 	cmds := commands{
 		registeredCommands: make(map[string]func(*state, command) error),
 	}
+  cmds.register("browse",middlewareLoggedIn(handlerBrowse))
   cmds.register("unfollow",middlewareLoggedIn(HandlerUnfollow))
   cmds.register("follow",middlewareLoggedIn(handlerFollow))
   cmds.register("following",middlewareLoggedIn(HandlerFollowing))
