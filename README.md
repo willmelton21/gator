@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Gator CLI
 
 Gator is a simple command-line tool built with Go that lets users manage feeds, follow other users, and aggregate content from sources. This project uses a PostgreSQL database for data storage and expects a configuration file to manage user sessions.
@@ -52,3 +53,6 @@ Notes
     Config file is automatically read from your home directory when running any command.
 
     You can change the current user with the login command, which updates your .gatorconfig.json.
+=======
+
+n
