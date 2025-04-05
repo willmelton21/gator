@@ -9,6 +9,28 @@ import (
   rss "github.com/willmelton21/gator/utils"
 )
 
+func scrapeFeeds(s *state) error {
+  currFeed, err := s.db.GetNextFeedToFetch(context.Background())
+  if err != nil {
+     return fmt.Errorf("failed to get next feed row: %v",err)
+  }
+  
+  err = s.db.MarkFeedFetched(context.Background(),currFeed[0].ID)
+  if err != nil {
+     return fmt.Errorf("failed to mark feed as fetched %v",err)
+  }
+
+  feed, err := rss.FetchFeed(context.Background(), currFeed[0].Url) 
+  if err != nil {
+    return fmt.Errorf("error fetching feed for current url %v",err)
+  }
+  
+  for _, post := range feed.Channel.Item {
+    fmt.Println(post.Title)
+  }
+  return nil
+}
+
 func middlewareLoggedIn(handler func(s *state, cmd command, user database.User) error) func(*state, command) error {
 
   return func(s *state, cmd command) error {
@@ -153,17 +175,23 @@ func printFeed(feed database.Feed) {
 }
 
 func RunAggregator(s *state, cmd command) error {
-
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer cancel()
-    
-    // Call fetchFeed with the context
-    feed, err := rss.FetchFeed(ctx, "https://www.wagslane.dev/index.xml")
+  
+    if len(cmd.Args) != 1 {
+      return fmt.Errorf("time argument not provided for %v",cmd.Name) 
+   }
+    t, err := time.ParseDuration(cmd.Args[0])
     if err != nil {
-        return fmt.Errorf("Couldn't fetch feed properly %w",err)
-  }
-    fmt.Printf("%+v\n", feed)
-    return nil
+     return fmt.Errorf("Proper time value was not entered %v",err)
+       }
+
+    fmt.Println("Collecting feeds every ",t)
+
+    ticker := time.NewTicker(t)
+    for ;; <-ticker.C {
+      scrapeFeeds(s) 
+     }
+  
+   return nil
 }
 
 
